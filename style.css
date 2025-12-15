@@ -1,209 +1,77 @@
-:root {
-    --bg-color: #1a1c1a; 
-    --text-primary: #e0e0e0;
-    --text-secondary: #8f9e8f;
-    --font-main: 'Inter', sans-serif;
+/* ...保留上面的設定，從 Connector 開始往下覆蓋... */
+
+/* 連接管 (Connector) */
+.connector {
+    width: 12px; /*稍微修細一點，讓滴落感更精緻*/
+    height: 24px;
+    border-left: var(--glass-border);
+    border-right: var(--glass-border);
+    background: var(--glass-bg);
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    margin: -1px 0;
+    overflow: hidden; /* 關鍵：把超出的滴落藏起來 */
+}
+
+/* 流動的線 (The Drip) - 重寫這段 */
+.stream {
+    width: 4px; /* 油滴比較細 */
+    height: 150%; /* 拉長，確保動畫連續 */
     
-    /* 核心變數 */
-    --theme-color: #d4a017; 
-    /* 修正：讓邊框更亮、更明顯 */
-    --glass-border: 2px solid rgba(255, 255, 255, 0.25);
-    --glass-bg: rgba(255, 255, 255, 0.03);
+    /* 這裡是用 CSS 畫出「一滴、空白、一滴」的圖案 */
+    background-image: linear-gradient(
+        to bottom,
+        var(--theme-color) 60%,  /* 60% 是油滴實體 */
+        transparent 60%          /* 40% 是間隙 */
+    );
+    background-size: 100% 15px; /* 設定每一滴油的大小與間距 */
+    
+    opacity: 0; 
+    transition: opacity 0.2s;
+    position: absolute;
+    top: -20px; /* 稍微往上藏一點 */
+    
+    /* 讓背景圖案往下跑，產生滴落錯覺 */
+    animation: drip-flow 0.4s linear infinite;
+    
+    /* 讓油滴看起來有點光暈，比較像液體 */
+    box-shadow: 0 0 4px var(--theme-color);
+    border-radius: 2px;
 }
 
-body.theme-shift { --theme-color: #d4a017; } /* Amber */
-body.theme-overload { --theme-color: #00b4d8; } /* Cyan */
-
-body {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    font-family: var(--font-main);
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    transition: background-color 0.5s ease;
+/* 定義滴落動畫 */
+@keyframes drip-flow {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 0 15px; /* 必須等於 background-size 的高度 */
+    }
 }
 
-.app-container {
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 90vh;
-}
-
-/* Header */
-.brand-header h1 {
-    font-weight: 600;
-    letter-spacing: 4px;
-    font-size: 1.2rem;
-    margin: 0;
-    color: var(--text-primary);
-}
-.subtitle {
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    margin-top: 5px;
-}
-
-/* --- Hourglass Core Design (High Contrast) --- */
-.hourglass-container {
-    width: 160px; /* 稍微加大 */
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    /* 移除 padding 確保緊密連接 */
-}
-
-/* 玻璃容器造型 */
-.bulb {
-    width: 120px;
-    height: 120px;
-    border: var(--glass-border);
-    background: var(--glass-bg); /* 增加底色 */
-    position: relative;
-    overflow: hidden; 
-    box-shadow: 0 0 15px rgba(0,0,0,0.3); /* 增加立體感 */
-}
-
-.top-bulb {
-    border-radius: 50% 50% 15% 15%; 
-    border-bottom: none; /* 下方開口 */
-    z-index: 2;
-}
-
-.bottom-bulb {
-    border-radius: 15% 15% 50% 50%; 
-    border-top: none; /* 上方開口 */
-    z-index: 2;
-}
-
-/* 液體樣式 */
+/* 液體樣式優化 - 讓液面也有點動態 */
 .liquid {
     width: 100%;
     background-color: var(--theme-color);
     position: absolute;
     bottom: 0;
     left: 0;
-    transition: height 0.3s linear; /* 改為 linear 讓流動更順 */
+    transition: height 0.3s linear;
+    
+    /* 增加液體表面的高光，看起來更有黏稠度 */
+    box-shadow: inset 0 2px 5px rgba(255,255,255,0.3);
 }
 
 .top-liquid {
-    height: 100%; /* 預設全滿 */
+    height: 100%; 
     border-top: 1px solid rgba(255,255,255,0.4);
 }
 
 .bottom-liquid {
-    height: 0%; /* 預設全空 */
+    height: 0%; 
     border-top: 1px solid rgba(255,255,255,0.2);
 }
 
-/* 連接管 (Connector) */
-.connector {
-    width: 16px; /* 寬一點 */
-    height: 20px;
-    border-left: var(--glass-border);  /* 畫出管壁 */
-    border-right: var(--glass-border); /* 畫出管壁 */
-    background: var(--glass-bg);
-    display: flex;
-    justify-content: center;
-    position: relative;
-    z-index: 1; /* 放在容器下方 */
-    margin: -1px 0; /* 修正接縫 */
-}
-
-/* 流動的線 (Stream) */
-.stream {
-    width: 6px; /* 粗一點 */
-    height: 140%; /* 長一點，確保連接 */
-    background-color: var(--theme-color);
-    opacity: 0; 
-    transition: opacity 0.2s;
-    box-shadow: 0 0 8px var(--theme-color);
-    position: absolute;
-    top: 0;
-}
-
-/* --- UI Controls --- */
-.mode-switcher {
-    display: flex;
-    gap: 15px;
-    background: rgba(255,255,255,0.05);
-    padding: 5px;
-    border-radius: 25px;
-}
-.mode-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.mode-btn.active {
-    background: var(--theme-color);
-    color: #1a1c1a;
-    font-weight: 600;
-}
-
-.time-control-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-top: 15px;
-}
-.time-display {
-    font-family: monospace;
-    font-size: 2rem;
-    color: var(--theme-color);
-    font-weight: 400;
-}
-.time-adjust-btn {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--text-secondary);
-    color: var(--text-secondary);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.time-adjust-btn:active {
-    background: var(--theme-color);
-    color: #1a1c1a;
-}
-
-.guide-section {
-    min-height: 60px;
-    margin-top: 10px;
-}
-#phase-title {
-    font-weight: 300;
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-    color: var(--text-primary);
-}
-#instruction-text {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-.action-btn
+/* ...保留下面的 UI Controls 設定... */
