@@ -4,18 +4,12 @@
     --text-secondary: #8f9e8f;
     --font-main: 'Inter', sans-serif;
     
-    /* 預設顏色 (Shift Mode) - 確保有底色 */
+    /* 預設顏色 */
     --theme-color: #d4a017; 
 }
 
-/* 這裡是關鍵：透過 body 的 class 來覆蓋變數 */
-body.theme-shift {
-    --theme-color: #d4a017; /* Amber */
-}
-
-body.theme-overload {
-    --theme-color: #00b4d8; /* Bright Cyan - 改亮一點，深色背景才看得清楚 */
-}
+body.theme-shift { --theme-color: #d4a017; } /* 琥珀金 */
+body.theme-overload { --theme-color: #00b4d8; } /* 冰河青 */
 
 body {
     background-color: var(--bg-color);
@@ -44,7 +38,7 @@ body {
     z-index: 10;
 }
 
-/* Header */
+/* Header & Text */
 .brand-header h1 {
     font-weight: 600;
     letter-spacing: 4px;
@@ -60,7 +54,89 @@ body {
     margin-top: 5px;
 }
 
-/* Buttons */
+/* Viscosity Visual - 重寫核心物理 */
+.viscosity-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* 加強對比度，讓黏連感更強 */
+    filter: url(#goo); 
+    -webkit-filter: url(#goo);
+}
+
+.liquid-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* 移除之前的整體旋轉，改為專注垂直動態 */
+}
+
+.liquid-orb {
+    position: absolute;
+    background-color: var(--theme-color, #d4a017); 
+    border-radius: 50%;
+    transition: background-color 0.8s ease;
+}
+
+/* 母體：緩慢呼吸 */
+.core-orb {
+    width: 120px;
+    height: 120px;
+    top: 80px;
+    left: 80px;
+    /* 讓母體形狀稍微不規則，更像液體 */
+    border-radius: 45% 55% 50% 50% / 50% 60% 40% 50%; 
+    animation: organic-breathe 6s ease-in-out infinite;
+}
+
+/* 子體：模擬 Lava Lamp (岩漿燈) */
+.floater-orb {
+    width: 70px;
+    height: 70px;
+    top: 105px;
+    left: 105px;
+    animation: lava-flow 8s ease-in-out infinite;
+}
+
+/* Animations - 重寫 */
+
+/* 母體的有機呼吸 */
+@keyframes organic-breathe {
+    0%, 100% { transform: scale(1) rotate(0deg); border-radius: 45% 55% 50% 50% / 50% 60% 40% 50%; }
+    50% { transform: scale(1.05) rotate(10deg); border-radius: 50% 50% 60% 40% / 45% 55% 45% 55%; }
+}
+
+/* 子體的黏滯流動：拉扯 -> 斷裂 -> 懸浮 -> 融合 */
+@keyframes lava-flow {
+    0% { 
+        transform: translate(0, 0); 
+    }
+    20% { 
+        /* 向上拉扯，還是黏住的 */
+        transform: translate(0, -50px) scale(0.9, 1.1); 
+    }
+    40% { 
+        /* 斷開，飛得更高 */
+        transform: translate(0, -90px) scale(0.95); 
+    }
+    50% { 
+        /* 最高點懸停 */
+        transform: translate(0, -95px) scale(1); 
+    }
+    70% { 
+        /* 緩慢下降 */
+        transform: translate(0, -50px) scale(1.05, 0.95); 
+    }
+    100% { 
+        /* 融合回母體 */
+        transform: translate(0, 0); 
+    }
+}
+
+/* Controls */
 .mode-switcher {
     display: flex;
     gap: 15px;
@@ -86,73 +162,6 @@ body {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
-/* Viscosity Visual - The Core */
-.viscosity-container {
-    position: relative;
-    width: 260px; /* 加大容器避免被切掉 */
-    height: 260px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* 濾鏡是關鍵，確保這裡生效 */
-    filter: url(#goo); 
-    -webkit-filter: url(#goo); /* 相容 Safari */
-    z-index: 1;
-}
-
-.liquid-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    animation: system-rotate 20s linear infinite;
-}
-
-.liquid-orb {
-    position: absolute;
-    /* 這裡使用變數，如果變數失敗，會回退到 orange */
-    background-color: var(--theme-color, orange); 
-    border-radius: 50%;
-    transition: background-color 0.8s ease;
-}
-
-/* 核心母體 */
-.core-orb {
-    width: 110px;
-    height: 110px;
-    top: 75px;
-    left: 75px;
-    animation: core-breathe 4s ease-in-out infinite;
-}
-
-/* 游離油滴 */
-.floater-orb {
-    width: 55px;
-    height: 55px;
-    top: 100px;
-    left: 100px;
-    animation: detach-orbit 6s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes core-breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-@keyframes detach-orbit {
-    0% { transform: translate(0, 0) scale(1); }
-    30% { transform: translate(70px, -70px) scale(0.8); } 
-    50% { transform: translate(0, -100px) scale(0.9); } 
-    70% { transform: translate(-70px, -50px) scale(0.8); } 
-    100% { transform: translate(0, 0) scale(1); }
-}
-
-@keyframes system-rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Time Controls */
 .time-control-wrapper {
     display: flex;
     align-items: center;
@@ -186,7 +195,6 @@ body {
     border-color: var(--theme-color);
 }
 
-/* Guide Section */
 .guide-section {
     min-height: 80px;
     margin-top: 20px;
@@ -203,7 +211,6 @@ body {
     margin: 0;
 }
 
-/* Action Button */
 .action-btn {
     background-color: var(--theme-color);
     color: #1a1c1a;
