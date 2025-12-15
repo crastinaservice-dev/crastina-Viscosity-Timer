@@ -87,16 +87,25 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.4);
         }
 
-        .top-bulb {
-            border-radius: 50% 50% 15% 15%; 
-            border-bottom: none;
-            z-index: 2;
+        /* 上瓶：改成上寬下窄的圓弧 */
         }
 
-        .bottom-bulb {
-            border-radius: 15% 15% 50% 50%; 
+       .top-bulb {
+            /* 關鍵語法：利用非對稱圓角做出水滴弧度 */
+            border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+            border-bottom: none;
+            z-index: 2;
+            margin-bottom: -4px; /* 讓它跟連接管接得更緊密 */
+        }
+
+        /* 下瓶：改成上窄下寬的圓弧 */
+
+       .bottom-bulb {
+            /* 關鍵語法：倒過來的水滴 */
+            border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
             border-top: none;
             z-index: 2;
+            margin-top: -4px; /* 讓它跟連接管接得更緊密 */
         }
 
         /* 液體樣式 */
@@ -467,3 +476,4 @@
     </script>
 </body>
 </html>
+
