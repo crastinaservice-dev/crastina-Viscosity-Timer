@@ -1,23 +1,24 @@
-// Configuration Data
+// Configuration
 const configs = {
     shift: {
-        defaultTime: 180, // 3 mins
+        defaultTime: 180, 
         text: "Warm Amber. Transition gently.",
-        className: "theme-shift" // 對應 CSS 的 class
+        className: "theme-shift"
     },
     overload: {
-        defaultTime: 90, // 1.5 mins
+        defaultTime: 90, 
         text: "Cool Cyan. Deep freeze.",
-        className: "theme-overload" // 對應 CSS 的 class
+        className: "theme-overload"
     }
 };
 
 // Global State
-let currentMode = ''; // 初始為空
+let currentMode = '';
 let totalSeconds = 180;
 let remainingSeconds = 180;
 let timerInterval = null;
 let isRunning = false;
+let audioCtx = null; // 音效核心
 
 // DOM Elements
 const body = document.body;
@@ -28,25 +29,60 @@ const actionBtn = document.getElementById('action-btn');
 const btnShift = document.getElementById('btn-shift');
 const btnOverload = document.getElementById('btn-overload');
 
-// Function: 切換模式
+// --- 音效引擎 (Web Audio API) ---
+// 瀏覽器通常需要使用者互動(點擊)後才能播放聲音，所以我們在 Start 時初始化
+function initAudio() {
+    if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+    }
+    // 恢復 suspended 的 context (這是 Chrome 的常見限制)
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playBellSound() {
+    if (!audioCtx) return;
+
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    // 設定聲音類型：Sine (正弦波) 最像頌缽/鐘聲
+    oscillator.type = 'sine';
+    
+    // 設定頻率：Crastina 風格應該低沈一點 (例如 432Hz 或 528Hz，這裡選 440Hz A4 標準音稍微降一點)
+    oscillator.frequency.setValueAtTime(432, audioCtx.currentTime); // 432Hz 更有冥想感
+    
+    // 音量控制：模擬敲擊後的自然衰減 (Envelope)
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.1); // 快速達到最大音量
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4); // 4秒內緩慢消失
+
+    // 連接線路
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    // 播放
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 4); // 4秒後停止
+}
+// ------------------------------
+
 function setMode(mode) {
-    if (isRunning) return; // 執行中不給切換
+    if (isRunning) return;
 
     currentMode = mode;
     
-    // 1. 強制移除所有主題 Class，再加入新的
     body.classList.remove('theme-shift', 'theme-overload');
     body.classList.add(configs[mode].className);
 
-    // 2. 更新按鈕狀態
     btnShift.classList.toggle('active', mode === 'shift');
     btnOverload.classList.toggle('active', mode === 'overload');
 
-    // 3. 重置時間
     totalSeconds = configs[mode].defaultTime;
     remainingSeconds = totalSeconds;
     
-    // 4. 更新文字
     instructionText.innerText = configs[mode].text;
     phaseTitle.innerText = "Ready";
     actionBtn.innerText = "Start Ritual";
@@ -54,34 +90,32 @@ function setMode(mode) {
     updateDisplay();
 }
 
-// Function: 調整時間 (+/-)
 function adjustTime(amount) {
     if (isRunning) return; 
 
     totalSeconds += amount;
-    if (totalSeconds < 30) totalSeconds = 30; // 最少 30秒
-    if (totalSeconds > 3600) totalSeconds = 3600; // 最多 60分
+    if (totalSeconds < 10) totalSeconds = 10; // 測試方便改小一點，正式可改回30
+    if (totalSeconds > 3600) totalSeconds = 3600;
     
     remainingSeconds = totalSeconds;
     updateDisplay();
 }
 
-// Function: 更新顯示 00:00
 function updateDisplay() {
     const mins = Math.floor(remainingSeconds / 60);
     const secs = remainingSeconds % 60;
     timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Function: 開始計時
 function startTimer() {
     if (isRunning) {
-        // Stop logic
         resetTimer();
         return;
     }
 
-    // Start logic
+    // 關鍵：初始化音效系統
+    initAudio();
+
     isRunning = true;
     actionBtn.innerText = "Stop";
     phaseTitle.innerText = "Flow";
@@ -97,7 +131,6 @@ function startTimer() {
     }, 1000);
 }
 
-// Function: 結束
 function completeTimer() {
     clearInterval(timerInterval);
     isRunning = false;
@@ -105,14 +138,16 @@ function completeTimer() {
     instructionText.innerText = "Ritual Complete.";
     actionBtn.innerText = "Reset";
     
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    // 播放聲音
+    playBellSound();
+
+    // 震動 (手機)
+    if (navigator.vibrate) navigator.vibrate([500]);
 }
 
-// Function: 重置
 function resetTimer() {
     clearInterval(timerInterval);
     isRunning = false;
-    // 重置回當前設定的時間
     remainingSeconds = totalSeconds; 
     actionBtn.innerText = "Start Ritual";
     phaseTitle.innerText = "Ready";
@@ -120,10 +155,8 @@ function resetTimer() {
     updateDisplay();
 }
 
-// Bind Events
 actionBtn.addEventListener('click', startTimer);
 
-// 【關鍵修正】頁面載入後，強制執行一次 Shift 模式初始化
 window.onload = function() {
     setMode('shift');
 };
