@@ -3,19 +3,19 @@ const configs = {
     shift: {
         defaultTime: 180, // 3 mins
         text: "Warm Amber. Transition gently.",
-        colorClass: "theme-shift"
+        className: "theme-shift" // 對應 CSS 的 class
     },
     overload: {
         defaultTime: 90, // 1.5 mins
         text: "Cool Cyan. Deep freeze.",
-        colorClass: "theme-overload"
+        className: "theme-overload" // 對應 CSS 的 class
     }
 };
 
 // Global State
-let currentMode = 'shift';
-let totalSeconds = configs.shift.defaultTime;
-let remainingSeconds = totalSeconds;
+let currentMode = ''; // 初始為空
+let totalSeconds = 180;
+let remainingSeconds = 180;
 let timerInterval = null;
 let isRunning = false;
 
@@ -28,60 +28,64 @@ const actionBtn = document.getElementById('action-btn');
 const btnShift = document.getElementById('btn-shift');
 const btnOverload = document.getElementById('btn-overload');
 
-// Init
-updateDisplay();
-
+// Function: 切換模式
 function setMode(mode) {
     if (isRunning) return; // 執行中不給切換
 
     currentMode = mode;
     
-    // Update Theme Colors
-    body.className = configs[mode].colorClass;
+    // 1. 強制移除所有主題 Class，再加入新的
+    body.classList.remove('theme-shift', 'theme-overload');
+    body.classList.add(configs[mode].className);
 
-    // Update Buttons UI
+    // 2. 更新按鈕狀態
     btnShift.classList.toggle('active', mode === 'shift');
     btnOverload.classList.toggle('active', mode === 'overload');
 
-    // Reset Time to Default for that mode
+    // 3. 重置時間
     totalSeconds = configs[mode].defaultTime;
     remainingSeconds = totalSeconds;
     
-    // Update Texts
+    // 4. 更新文字
     instructionText.innerText = configs[mode].text;
+    phaseTitle.innerText = "Ready";
+    actionBtn.innerText = "Start Ritual";
+    
     updateDisplay();
 }
 
+// Function: 調整時間 (+/-)
 function adjustTime(amount) {
-    if (isRunning) return; // 執行中不給調整
+    if (isRunning) return; 
 
     totalSeconds += amount;
-    // 限制時間：最少 30秒，最多 60分鐘
-    if (totalSeconds < 30) totalSeconds = 30;
-    if (totalSeconds > 3600) totalSeconds = 3600;
+    if (totalSeconds < 30) totalSeconds = 30; // 最少 30秒
+    if (totalSeconds > 3600) totalSeconds = 3600; // 最多 60分
     
     remainingSeconds = totalSeconds;
     updateDisplay();
 }
 
+// Function: 更新顯示 00:00
 function updateDisplay() {
     const mins = Math.floor(remainingSeconds / 60);
     const secs = remainingSeconds % 60;
     timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+// Function: 開始計時
 function startTimer() {
     if (isRunning) {
-        // User clicked STOP
+        // Stop logic
         resetTimer();
         return;
     }
 
-    // START
+    // Start logic
     isRunning = true;
     actionBtn.innerText = "Stop";
     phaseTitle.innerText = "Flow";
-    instructionText.innerText = "Follow the oil. Breathe.";
+    instructionText.innerText = currentMode === 'shift' ? "Follow the oil. Breathe." : "Ground yourself. Press down.";
 
     timerInterval = setInterval(() => {
         remainingSeconds--;
@@ -93,6 +97,7 @@ function startTimer() {
     }, 1000);
 }
 
+// Function: 結束
 function completeTimer() {
     clearInterval(timerInterval);
     isRunning = false;
@@ -100,19 +105,25 @@ function completeTimer() {
     instructionText.innerText = "Ritual Complete.";
     actionBtn.innerText = "Reset";
     
-    // 簡單的震動 (Mobile)
-    if (navigator.vibrate) navigator.vibrate([200]);
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
+// Function: 重置
 function resetTimer() {
     clearInterval(timerInterval);
     isRunning = false;
-    remainingSeconds = totalSeconds; // 重置回設定的時間
+    // 重置回當前設定的時間
+    remainingSeconds = totalSeconds; 
     actionBtn.innerText = "Start Ritual";
     phaseTitle.innerText = "Ready";
     instructionText.innerText = configs[currentMode].text;
     updateDisplay();
 }
 
-// Button Listener (already in HTML onclick, but kept for safety)
+// Bind Events
 actionBtn.addEventListener('click', startTimer);
+
+// 【關鍵修正】頁面載入後，強制執行一次 Shift 模式初始化
+window.onload = function() {
+    setMode('shift');
+};
