@@ -1,126 +1,118 @@
-// Configuration: 定義兩種模式的參數
+// Configuration Data
 const configs = {
     shift: {
-        totalTime: 180, // 3分鐘
-        name: "Shift Reset",
-        phases: [
-            { end: 170, title: "Pause", text: "Cut the noise. Warm the oil in your hands." }, // 前10秒
-            { end: 30, title: "Breathe", text: "Inhale the gap. Focus on the scent." },      // 中間主要時間
-            { end: 0, title: "Flow", text: "Wipe it off. Return to yourself." }               // 最後30秒
-        ],
-        animationSpeed: "6s" // 呼吸速度
+        defaultTime: 180, // 3 mins
+        text: "Warm Amber. Transition gently.",
+        colorClass: "theme-shift"
     },
     overload: {
-        totalTime: 90, // 1.5分鐘
-        name: "Overload Reset",
-        phases: [
-            { end: 80, title: "Stop", text: "Freeze. Feel the cold glass of the bottle." },
-            { end: 10, title: "Grounding", text: "Deep pressure. Feel the weight." },
-            { end: 0, title: "Here & Now", text: "Press down. Anchor yourself." }
-        ],
-        animationSpeed: "10s" // 極慢速，強迫鎮靜
+        defaultTime: 90, // 1.5 mins
+        text: "Cool Cyan. Deep freeze.",
+        colorClass: "theme-overload"
     }
 };
 
+// Global State
 let currentMode = 'shift';
-let timeLeft = configs.shift.totalTime;
+let totalSeconds = configs.shift.defaultTime;
+let remainingSeconds = totalSeconds;
 let timerInterval = null;
 let isRunning = false;
 
 // DOM Elements
+const body = document.body;
 const timerDisplay = document.getElementById('timer-display');
 const phaseTitle = document.getElementById('phase-title');
 const instructionText = document.getElementById('instruction-text');
 const actionBtn = document.getElementById('action-btn');
-const mainOrb = document.querySelector('.main-orb');
-const modeBtns = document.querySelectorAll('.mode-btn');
+const btnShift = document.getElementById('btn-shift');
+const btnOverload = document.getElementById('btn-overload');
 
-// Initialize
-updateDisplay(timeLeft);
+// Init
+updateDisplay();
 
 function setMode(mode) {
-    if (isRunning) resetTimer(); // 如果正在跑，切換模式要先重置
-    
-    currentMode = mode;
-    timeLeft = configs[mode].totalTime;
-    
-    // Update Buttons UI
-    modeBtns.forEach(btn => {
-        btn.classList.remove('active');
-        if(btn.dataset.mode === mode) btn.classList.add('active');
-    });
+    if (isRunning) return; // 執行中不給切換
 
-    // Reset Text
-    phaseTitle.innerText = "Ready";
-    instructionText.innerText = mode === 'shift' ? "Transition from work to life." : "Emergency brake for your mind.";
+    currentMode = mode;
     
-    // Adjust Animation Speed based on mode
-    mainOrb.style.animationDuration = configs[mode].animationSpeed;
+    // Update Theme Colors
+    body.className = configs[mode].colorClass;
+
+    // Update Buttons UI
+    btnShift.classList.toggle('active', mode === 'shift');
+    btnOverload.classList.toggle('active', mode === 'overload');
+
+    // Reset Time to Default for that mode
+    totalSeconds = configs[mode].defaultTime;
+    remainingSeconds = totalSeconds;
     
-    updateDisplay(timeLeft);
+    // Update Texts
+    instructionText.innerText = configs[mode].text;
+    updateDisplay();
 }
 
-function updateDisplay(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+function adjustTime(amount) {
+    if (isRunning) return; // 執行中不給調整
+
+    totalSeconds += amount;
+    // 限制時間：最少 30秒，最多 60分鐘
+    if (totalSeconds < 30) totalSeconds = 30;
+    if (totalSeconds > 3600) totalSeconds = 3600;
+    
+    remainingSeconds = totalSeconds;
+    updateDisplay();
+}
+
+function updateDisplay() {
+    const mins = Math.floor(remainingSeconds / 60);
+    const secs = remainingSeconds % 60;
     timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 function startTimer() {
     if (isRunning) {
+        // User clicked STOP
         resetTimer();
         return;
     }
 
+    // START
     isRunning = true;
-    actionBtn.innerText = "Stop Ritual";
-    
-    // Start the countdown
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        updateDisplay(timeLeft);
-        checkPhase(timeLeft);
+    actionBtn.innerText = "Stop";
+    phaseTitle.innerText = "Flow";
+    instructionText.innerText = "Follow the oil. Breathe.";
 
-        if (timeLeft <= 0) {
+    timerInterval = setInterval(() => {
+        remainingSeconds--;
+        updateDisplay();
+
+        if (remainingSeconds <= 0) {
             completeTimer();
         }
     }, 1000);
-    
-    // Initial Phase Check
-    checkPhase(timeLeft);
-}
-
-function checkPhase(currentTime) {
-    const config = configs[currentMode];
-    // Find which phase we are in
-    const currentPhase = config.phases.find(p => currentTime > p.end) || config.phases[config.phases.length - 1];
-    
-    if (currentPhase) {
-        phaseTitle.innerText = currentPhase.title;
-        instructionText.innerText = currentPhase.text;
-    }
 }
 
 function completeTimer() {
     clearInterval(timerInterval);
-    phaseTitle.innerText = "Completed";
-    instructionText.innerText = "Carry this calmness forward.";
-    actionBtn.innerText = "Reset";
     isRunning = false;
+    phaseTitle.innerText = "Done";
+    instructionText.innerText = "Ritual Complete.";
+    actionBtn.innerText = "Reset";
     
-    // Haptic feedback if available (Mobile only)
-    if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]); // 兩次震動提醒結束
-    }
+    // 簡單的震動 (Mobile)
+    if (navigator.vibrate) navigator.vibrate([200]);
 }
 
 function resetTimer() {
     clearInterval(timerInterval);
     isRunning = false;
-    timeLeft = configs[currentMode].totalTime;
+    remainingSeconds = totalSeconds; // 重置回設定的時間
     actionBtn.innerText = "Start Ritual";
-    setMode(currentMode); // Reset texts
+    phaseTitle.innerText = "Ready";
+    instructionText.innerText = configs[currentMode].text;
+    updateDisplay();
 }
 
-// Event Listener
+// Button Listener (already in HTML onclick, but kept for safety)
 actionBtn.addEventListener('click', startTimer);
