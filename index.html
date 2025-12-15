@@ -16,8 +16,8 @@
             
             /* 核心變數 */
             --theme-color: #d4a017; 
-            --glass-border: 2px solid rgba(255, 255, 255, 0.3); /* 增強對比 */
-            --glass-bg: rgba(255, 255, 255, 0.05); /* 增強底色 */
+            --glass-border: 2px solid rgba(255, 255, 255, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.05);
         }
 
         body.theme-shift { --theme-color: #d4a017; } /* Amber */
@@ -34,7 +34,7 @@
             height: 100vh;
             overflow: hidden;
             transition: background-color 0.5s ease;
-            -webkit-tap-highlight-color: transparent; /* 移除手機點擊藍框 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .app-container {
@@ -46,7 +46,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            height: 90vh; /* 手機適配 */
+            height: 90vh;
         }
 
         /* Header */
@@ -107,7 +107,7 @@
             bottom: 0;
             left: 0;
             transition: height 0.3s linear;
-            box-shadow: inset 0 2px 5px rgba(255,255,255,0.3); /* 液面高光 */
+            box-shadow: inset 0 2px 5px rgba(255,255,255,0.3);
         }
 
         .top-liquid {
@@ -144,12 +144,12 @@
                 var(--theme-color) 60%, 
                 transparent 60%
             );
-            background-size: 100% 15px; /* 滴落間距 */
+            background-size: 100% 15px; 
             opacity: 0; 
             transition: opacity 0.2s;
             position: absolute;
             top: -20px;
-            animation: drip-flow 0.4s linear infinite; /* 滴落速度 */
+            animation: drip-flow 0.4s linear infinite; 
             box-shadow: 0 0 4px var(--theme-color);
             border-radius: 2px;
         }
@@ -207,7 +207,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            -webkit-user-select: none; /* 防止手機長按選取 */
+            -webkit-user-select: none;
         }
         .time-adjust-btn:active {
             background: var(--theme-color);
