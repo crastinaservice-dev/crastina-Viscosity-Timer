@@ -7,14 +7,16 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
-<body class="theme-shift"> <div class="app-container">
+<body> 
+
+    <div class="app-container">
         <header class="brand-header">
             <h1>CRASTINA</h1>
             <p class="subtitle">Viscosity Timer</p>
         </header>
 
         <div class="mode-switcher">
-            <button class="mode-btn active" id="btn-shift" onclick="setMode('shift')">Shift Reset</button>
+            <button class="mode-btn" id="btn-shift" onclick="setMode('shift')">Shift Reset</button>
             <button class="mode-btn" id="btn-overload" onclick="setMode('overload')">Overload</button>
         </div>
 
@@ -23,10 +25,11 @@
                 <div class="liquid-orb core-orb"></div>
                 <div class="liquid-orb floater-orb"></div>
             </div>
-            <svg style="visibility: hidden; position: absolute;" width="0" height="0">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="position: absolute; width: 0; height: 0;">
                 <defs>
                     <filter id="goo">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
                         <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
                         <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
                     </filter>
