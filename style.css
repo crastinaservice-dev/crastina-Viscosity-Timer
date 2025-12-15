@@ -1,10 +1,20 @@
 :root {
-    --bg-color: #1a1c1a; /* 深沈的黑綠色 */
+    --bg-color: #1a1c1a; 
     --text-primary: #e0e0e0;
     --text-secondary: #8f9e8f;
-    --accent-oil: #d4a017; /* 琥珀油色 */
-    --accent-calm: #4a5d4a; /* 苔綠色 */
     --font-main: 'Inter', sans-serif;
+    
+    /* 動態變數：會隨模式改變 */
+    --theme-color: #d4a017; /* 預設 Amber */
+    --orb-opacity: 0.8;
+}
+
+/* 雙模式色票定義 */
+body.theme-shift {
+    --theme-color: #d4a017; /* 琥珀金 */
+}
+body.theme-overload {
+    --theme-color: #2a9d8f; /* 深海青 (冷靜色) */
 }
 
 body {
@@ -17,6 +27,7 @@ body {
     align-items: center;
     height: 100vh;
     overflow: hidden;
+    transition: background-color 0.5s ease;
 }
 
 .app-container {
@@ -37,7 +48,7 @@ body {
     letter-spacing: 4px;
     font-size: 1.2rem;
     margin: 0;
-    opacity: 0.9;
+    color: var(--text-primary);
 }
 .subtitle {
     font-size: 0.7rem;
@@ -47,119 +58,159 @@ body {
     margin-top: 5px;
 }
 
-/* Mode Switcher */
+/* Buttons */
 .mode-switcher {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
+    gap: 15px;
+    background: rgba(255,255,255,0.05);
+    padding: 5px;
+    border-radius: 25px;
 }
 .mode-btn {
     background: transparent;
-    border: 1px solid var(--text-secondary);
+    border: none;
     color: var(--text-secondary);
-    padding: 8px 16px;
+    padding: 8px 20px;
     border-radius: 20px;
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 .mode-btn.active {
-    border-color: var(--accent-oil);
-    color: var(--accent-oil);
-    background: rgba(212, 160, 23, 0.1);
+    background: var(--theme-color);
+    color: #1a1c1a; /* 文字反黑 */
+    font-weight: 600;
+    box-shadow: 0 0 10px var(--theme-color);
 }
 
-/* Viscosity Visual (The Core) */
+/* Viscosity Visual (The Oil Physics) */
 .viscosity-container {
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     display: flex;
     justify-content: center;
     align-items: center;
-    filter: url(#goo); /* 這是液體融合的關鍵 */
+    filter: url(#goo); /* 融合濾鏡 */
 }
 
 .liquid-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
-    animation: rotate 10s linear infinite;
+    /* 整個系統稍微旋轉，增加不確定性 */
+    animation: system-rotate 20s linear infinite; 
 }
 
 .liquid-orb {
     position: absolute;
-    background: var(--accent-oil);
+    background: var(--theme-color);
     border-radius: 50%;
-    opacity: 0.8;
-    transition: transform 0.5s ease;
+    transition: background-color 0.8s ease;
 }
 
-.main-orb {
-    width: 120px;
-    height: 120px;
-    top: 40px;
-    left: 40px;
-    animation: breathe 6s ease-in-out infinite;
+/* 核心母體：呼吸 */
+.core-orb {
+    width: 100px;
+    height: 100px;
+    top: 60px;
+    left: 60px;
+    opacity: 1;
+    animation: core-breathe 4s ease-in-out infinite;
 }
 
-.sub-orb {
-    width: 60px;
-    height: 60px;
-    top: 20px;
-    left: 70px;
-    animation: float 8s ease-in-out infinite;
+/* 游離油滴：四處碰撞/剝離 */
+.floater-orb {
+    width: 50px;
+    height: 50px;
+    top: 85px;
+    left: 85px;
+    opacity: 0.9;
+    /* 這裡定義剝離的路徑 */
+    animation: detach-orbit 5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
 }
 
-/* Animations for "Shift" vs "Overload" */
-@keyframes breathe {
+/* Animations */
+@keyframes core-breathe {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    50% { transform: scale(1.05); }
 }
-@keyframes float {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(20px, -20px); }
+
+@keyframes detach-orbit {
+    0% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(60px, -60px) scale(0.8); } /* 向右上剝離 */
+    50% { transform: translate(0, -90px) scale(0.9); } /* 游離到上方 */
+    75% { transform: translate(-60px, -40px) scale(0.8); } /* 左側 */
+    100% { transform: translate(0, 0) scale(1); } /* 回歸母體 */
 }
-@keyframes rotate {
+
+@keyframes system-rotate {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
+/* Time Controls */
+.time-control-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.time-display {
+    font-family: monospace;
+    font-size: 2rem;
+    color: var(--theme-color);
+    transition: color 0.5s ease;
+    font-weight: 300;
+}
+.time-adjust-btn {
+    background: none;
+    border: 1px solid var(--text-secondary);
+    color: var(--text-secondary);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.time-adjust-btn:active {
+    background: var(--theme-color);
+    color: #000;
+    border-color: var(--theme-color);
+}
+
 /* Guide Section */
 .guide-section {
-    min-height: 120px;
+    min-height: 80px;
 }
 #phase-title {
     font-weight: 300;
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    color: var(--accent-oil);
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: var(--text-primary);
 }
 #instruction-text {
     font-size: 0.9rem;
     color: var(--text-secondary);
-    line-height: 1.5;
-    max-width: 300px;
-    margin: 0 auto;
-}
-.time-display {
-    margin-top: 15px;
-    font-family: monospace;
-    font-size: 1.2rem;
-    opacity: 0.5;
+    margin: 0;
 }
 
-/* Button */
+/* Action Button */
 .action-btn {
-    background-color: var(--text-primary);
-    color: var(--bg-color);
+    background-color: var(--theme-color);
+    color: #1a1c1a;
     border: none;
-    padding: 15px 40px;
+    padding: 15px 50px;
     border-radius: 30px;
     font-size: 1rem;
+    font-weight: 600;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 .action-btn:active {
     transform: scale(0.95);
