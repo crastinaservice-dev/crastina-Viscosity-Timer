@@ -4,9 +4,11 @@
     --text-secondary: #8f9e8f;
     --font-main: 'Inter', sans-serif;
     
-    /* Default Theme */
+    /* 核心變數 */
     --theme-color: #d4a017; 
-    --glass-border: rgba(255, 255, 255, 0.1);
+    /* 修正：讓邊框更亮、更明顯 */
+    --glass-border: 2px solid rgba(255, 255, 255, 0.25);
+    --glass-bg: rgba(255, 255, 255, 0.03);
 }
 
 body.theme-shift { --theme-color: #d4a017; } /* Amber */
@@ -53,36 +55,39 @@ body {
     margin-top: 5px;
 }
 
-/* --- Hourglass Core Design --- */
+/* --- Hourglass Core Design (High Contrast) --- */
 .hourglass-container {
-    width: 140px;
-    height: 280px;
+    width: 160px; /* 稍微加大 */
+    height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 10px;
+    /* 移除 padding 確保緊密連接 */
 }
 
 /* 玻璃容器造型 */
 .bulb {
-    width: 100px;
-    height: 100px;
-    border: 1px solid var(--glass-border);
+    width: 120px;
+    height: 120px;
+    border: var(--glass-border);
+    background: var(--glass-bg); /* 增加底色 */
     position: relative;
-    overflow: hidden; /* 確保液體不溢出 */
-    background: rgba(255,255,255,0.02);
+    overflow: hidden; 
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); /* 增加立體感 */
 }
 
 .top-bulb {
-    border-radius: 50% 50% 10% 10%; /* 上圓下平 */
-    border-bottom: none;
+    border-radius: 50% 50% 15% 15%; 
+    border-bottom: none; /* 下方開口 */
+    z-index: 2;
 }
 
 .bottom-bulb {
-    border-radius: 10% 10% 50% 50%; /* 上平下圓 */
-    border-top: none;
+    border-radius: 15% 15% 50% 50%; 
+    border-top: none; /* 上方開口 */
+    z-index: 2;
 }
 
 /* 液體樣式 */
@@ -90,43 +95,48 @@ body {
     width: 100%;
     background-color: var(--theme-color);
     position: absolute;
-    transition: height 0.3s ease, background-color 0.5s ease; /* 高度變化要有滑順感 */
+    bottom: 0;
+    left: 0;
+    transition: height 0.3s linear; /* 改為 linear 讓流動更順 */
 }
 
 .top-liquid {
-    bottom: 0;
-    height: 100%; /* 初始全滿 */
-    /* 增加一點表面波動感 (選用) */
-    border-top: 1px solid rgba(255,255,255,0.3);
+    height: 100%; /* 預設全滿 */
+    border-top: 1px solid rgba(255,255,255,0.4);
 }
 
 .bottom-liquid {
-    bottom: 0;
-    height: 0%; /* 初始全空 */
-    border-top: 1px solid rgba(255,255,255,0.3);
+    height: 0%; /* 預設全空 */
+    border-top: 1px solid rgba(255,255,255,0.2);
 }
 
-/* 連接管與流動線 */
+/* 連接管 (Connector) */
 .connector {
-    width: 40px;
+    width: 16px; /* 寬一點 */
     height: 20px;
+    border-left: var(--glass-border);  /* 畫出管壁 */
+    border-right: var(--glass-border); /* 畫出管壁 */
+    background: var(--glass-bg);
     display: flex;
     justify-content: center;
     position: relative;
-    z-index: 2; /* 蓋住上下容器邊緣 */
+    z-index: 1; /* 放在容器下方 */
+    margin: -1px 0; /* 修正接縫 */
 }
 
-/* 流動的線 */
+/* 流動的線 (Stream) */
 .stream {
-    width: 4px;
-    height: 100%; 
+    width: 6px; /* 粗一點 */
+    height: 140%; /* 長一點，確保連接 */
     background-color: var(--theme-color);
-    opacity: 0; /* 預設隱藏，開始計時才出現 */
-    transition: opacity 0.3s, background-color 0.5s ease;
-    box-shadow: 0 0 10px var(--theme-color);
+    opacity: 0; 
+    transition: opacity 0.2s;
+    box-shadow: 0 0 8px var(--theme-color);
+    position: absolute;
+    top: 0;
 }
 
-/* --- Controls & UI --- */
+/* --- UI Controls --- */
 .mode-switcher {
     display: flex;
     gap: 15px;
@@ -154,17 +164,16 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 .time-display {
     font-family: monospace;
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: var(--theme-color);
-    transition: color 0.5s ease;
-    font-weight: 300;
+    font-weight: 400;
 }
 .time-adjust-btn {
-    background: none;
+    background: rgba(255,255,255,0.05);
     border: 1px solid var(--text-secondary);
     color: var(--text-secondary);
     width: 40px;
@@ -175,20 +184,19 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
 }
 .time-adjust-btn:active {
     background: var(--theme-color);
     color: #1a1c1a;
-    border-color: var(--theme-color);
 }
 
 .guide-section {
-    min-height: 80px;
+    min-height: 60px;
+    margin-top: 10px;
 }
 #phase-title {
     font-weight: 300;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     margin-bottom: 5px;
     color: var(--text-primary);
 }
@@ -198,19 +206,4 @@ body {
     margin: 0;
 }
 
-.action-btn {
-    background-color: var(--theme-color);
-    color: #1a1c1a;
-    border: none;
-    padding: 15px 60px;
-    border-radius: 30px;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 10px;
-}
-.action-btn:active {
-    transform: scale(0.95);
-}
+.action-btn
