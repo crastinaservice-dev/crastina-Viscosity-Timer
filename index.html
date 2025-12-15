@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crastina | Reset Timer</title>
+    <title>Crastina | Viscosity Timer</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
-<body>
-
-    <div class="app-container">
+<body class="theme-shift"> <div class="app-container">
         <header class="brand-header">
             <h1>CRASTINA</h1>
-            <p class="subtitle">Reset Rituals</p>
+            <p class="subtitle">Viscosity Timer</p>
         </header>
 
         <div class="mode-switcher">
-            <button class="mode-btn active" data-mode="shift" onclick="setMode('shift')">Shift Reset</button>
-            <button class="mode-btn" data-mode="overload" onclick="setMode('overload')">Overload Reset</button>
+            <button class="mode-btn active" id="btn-shift" onclick="setMode('shift')">Shift Reset</button>
+            <button class="mode-btn" id="btn-overload" onclick="setMode('overload')">Overload</button>
         </div>
 
         <div class="viscosity-container">
             <div class="liquid-wrapper">
-                <div class="liquid-orb main-orb"></div>
-                <div class="liquid-orb sub-orb"></div>
+                <div class="liquid-orb core-orb"></div>
+                <div class="liquid-orb floater-orb"></div>
             </div>
             <svg style="visibility: hidden; position: absolute;" width="0" height="0">
                 <defs>
@@ -36,10 +34,15 @@
             </svg>
         </div>
 
+        <div class="time-control-wrapper">
+            <button class="time-adjust-btn" onclick="adjustTime(-30)">−</button>
+            <div class="time-display" id="timer-display">03:00</div>
+            <button class="time-adjust-btn" onclick="adjustTime(30)">+</button>
+        </div>
+
         <div class="guide-section">
             <h2 id="phase-title">Ready</h2>
-            <p id="instruction-text">Choose your ritual mode.</p>
-            <div class="time-display" id="timer-display">03:00</div>
+            <p id="instruction-text">Set your time. Detach from the noise.</p>
         </div>
 
         <div class="controls">
