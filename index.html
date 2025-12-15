@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crastina | Viscosity Timer</title>
+    <title>Crastina | Ritual Hourglass</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
@@ -12,29 +12,26 @@
     <div class="app-container">
         <header class="brand-header">
             <h1>CRASTINA</h1>
-            <p class="subtitle">Viscosity Timer</p>
+            <p class="subtitle">Awareness Timer</p>
         </header>
 
         <div class="mode-switcher">
-            <button class="mode-btn" id="btn-shift" onclick="setMode('shift')">Shift Reset</button>
+            <button class="mode-btn" id="btn-shift" onclick="setMode('shift')">Shift</button>
             <button class="mode-btn" id="btn-overload" onclick="setMode('overload')">Overload</button>
         </div>
 
-        <div class="viscosity-container">
-            <div class="liquid-wrapper">
-                <div class="liquid-orb core-orb"></div>
-                <div class="liquid-orb floater-orb"></div>
+        <div class="hourglass-container">
+            <div class="bulb top-bulb">
+                <div class="liquid top-liquid" id="liquid-top"></div>
             </div>
             
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="position: absolute; width: 0; height: 0;">
-                <defs>
-                    <filter id="goo">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
-                        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
-                        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-                    </filter>
-                </defs>
-            </svg>
+            <div class="connector">
+                <div class="stream" id="stream-line"></div>
+            </div>
+
+            <div class="bulb bottom-bulb">
+                <div class="liquid bottom-liquid" id="liquid-bottom"></div>
+            </div>
         </div>
 
         <div class="time-control-wrapper">
@@ -45,7 +42,7 @@
 
         <div class="guide-section">
             <h2 id="phase-title">Ready</h2>
-            <p id="instruction-text">Set your time. Detach from the noise.</p>
+            <p id="instruction-text">Set time. Watch the flow.</p>
         </div>
 
         <div class="controls">
