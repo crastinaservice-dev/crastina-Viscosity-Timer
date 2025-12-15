@@ -4,12 +4,13 @@
     --text-secondary: #8f9e8f;
     --font-main: 'Inter', sans-serif;
     
-    /* 預設顏色 */
+    /* Default Theme */
     --theme-color: #d4a017; 
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
-body.theme-shift { --theme-color: #d4a017; } /* 琥珀金 */
-body.theme-overload { --theme-color: #00b4d8; } /* 冰河青 */
+body.theme-shift { --theme-color: #d4a017; } /* Amber */
+body.theme-overload { --theme-color: #00b4d8; } /* Cyan */
 
 body {
     background-color: var(--bg-color);
@@ -34,11 +35,9 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 90vh;
-    position: relative;
-    z-index: 10;
 }
 
-/* Header & Text */
+/* Header */
 .brand-header h1 {
     font-weight: 600;
     letter-spacing: 4px;
@@ -54,96 +53,86 @@ body {
     margin-top: 5px;
 }
 
-/* Viscosity Visual - 重寫核心物理 */
-.viscosity-container {
-    position: relative;
-    width: 280px;
+/* --- Hourglass Core Design --- */
+.hourglass-container {
+    width: 140px;
     height: 280px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    /* 加強對比度，讓黏連感更強 */
-    filter: url(#goo); 
-    -webkit-filter: url(#goo);
-}
-
-.liquid-wrapper {
+    justify-content: center;
     position: relative;
+    padding: 10px;
+}
+
+/* 玻璃容器造型 */
+.bulb {
+    width: 100px;
+    height: 100px;
+    border: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden; /* 確保液體不溢出 */
+    background: rgba(255,255,255,0.02);
+}
+
+.top-bulb {
+    border-radius: 50% 50% 10% 10%; /* 上圓下平 */
+    border-bottom: none;
+}
+
+.bottom-bulb {
+    border-radius: 10% 10% 50% 50%; /* 上平下圓 */
+    border-top: none;
+}
+
+/* 液體樣式 */
+.liquid {
     width: 100%;
-    height: 100%;
-    /* 移除之前的整體旋轉，改為專注垂直動態 */
-}
-
-.liquid-orb {
+    background-color: var(--theme-color);
     position: absolute;
-    background-color: var(--theme-color, #d4a017); 
-    border-radius: 50%;
-    transition: background-color 0.8s ease;
+    transition: height 0.3s ease, background-color 0.5s ease; /* 高度變化要有滑順感 */
 }
 
-/* 母體：緩慢呼吸 */
-.core-orb {
-    width: 120px;
-    height: 120px;
-    top: 80px;
-    left: 80px;
-    /* 讓母體形狀稍微不規則，更像液體 */
-    border-radius: 45% 55% 50% 50% / 50% 60% 40% 50%; 
-    animation: organic-breathe 6s ease-in-out infinite;
+.top-liquid {
+    bottom: 0;
+    height: 100%; /* 初始全滿 */
+    /* 增加一點表面波動感 (選用) */
+    border-top: 1px solid rgba(255,255,255,0.3);
 }
 
-/* 子體：模擬 Lava Lamp (岩漿燈) */
-.floater-orb {
-    width: 70px;
-    height: 70px;
-    top: 105px;
-    left: 105px;
-    animation: lava-flow 8s ease-in-out infinite;
+.bottom-liquid {
+    bottom: 0;
+    height: 0%; /* 初始全空 */
+    border-top: 1px solid rgba(255,255,255,0.3);
 }
 
-/* Animations - 重寫 */
-
-/* 母體的有機呼吸 */
-@keyframes organic-breathe {
-    0%, 100% { transform: scale(1) rotate(0deg); border-radius: 45% 55% 50% 50% / 50% 60% 40% 50%; }
-    50% { transform: scale(1.05) rotate(10deg); border-radius: 50% 50% 60% 40% / 45% 55% 45% 55%; }
+/* 連接管與流動線 */
+.connector {
+    width: 40px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2; /* 蓋住上下容器邊緣 */
 }
 
-/* 子體的黏滯流動：拉扯 -> 斷裂 -> 懸浮 -> 融合 */
-@keyframes lava-flow {
-    0% { 
-        transform: translate(0, 0); 
-    }
-    20% { 
-        /* 向上拉扯，還是黏住的 */
-        transform: translate(0, -50px) scale(0.9, 1.1); 
-    }
-    40% { 
-        /* 斷開，飛得更高 */
-        transform: translate(0, -90px) scale(0.95); 
-    }
-    50% { 
-        /* 最高點懸停 */
-        transform: translate(0, -95px) scale(1); 
-    }
-    70% { 
-        /* 緩慢下降 */
-        transform: translate(0, -50px) scale(1.05, 0.95); 
-    }
-    100% { 
-        /* 融合回母體 */
-        transform: translate(0, 0); 
-    }
+/* 流動的線 */
+.stream {
+    width: 4px;
+    height: 100%; 
+    background-color: var(--theme-color);
+    opacity: 0; /* 預設隱藏，開始計時才出現 */
+    transition: opacity 0.3s, background-color 0.5s ease;
+    box-shadow: 0 0 10px var(--theme-color);
 }
 
-/* Controls */
+/* --- Controls & UI --- */
 .mode-switcher {
     display: flex;
     gap: 15px;
     background: rgba(255,255,255,0.05);
     padding: 5px;
     border-radius: 25px;
-    margin-bottom: 20px;
 }
 .mode-btn {
     background: transparent;
@@ -159,7 +148,6 @@ body {
     background: var(--theme-color);
     color: #1a1c1a;
     font-weight: 600;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 .time-control-wrapper {
@@ -197,7 +185,6 @@ body {
 
 .guide-section {
     min-height: 80px;
-    margin-top: 20px;
 }
 #phase-title {
     font-weight: 300;
@@ -222,7 +209,7 @@ body {
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .action-btn:active {
     transform: scale(0.95);
