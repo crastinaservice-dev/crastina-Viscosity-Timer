@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crastina | Reset Timer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="brand-header">
+            <h1>CRASTINA</h1>
+            <p class="subtitle">Reset Rituals</p>
+        </header>
+
+        <div class="mode-switcher">
+            <button class="mode-btn active" data-mode="shift" onclick="setMode('shift')">Shift Reset</button>
+            <button class="mode-btn" data-mode="overload" onclick="setMode('overload')">Overload Reset</button>
+        </div>
+
+        <div class="viscosity-container">
+            <div class="liquid-wrapper">
+                <div class="liquid-orb main-orb"></div>
+                <div class="liquid-orb sub-orb"></div>
+            </div>
+            <svg style="visibility: hidden; position: absolute;" width="0" height="0">
+                <defs>
+                    <filter id="goo">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="goo" />
+                        <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+                    </filter>
+                </defs>
+            </svg>
+        </div>
+
+        <div class="guide-section">
+            <h2 id="phase-title">Ready</h2>
+            <p id="instruction-text">Choose your ritual mode.</p>
+            <div class="time-display" id="timer-display">03:00</div>
+        </div>
+
+        <div class="controls">
+            <button id="action-btn" class="action-btn">Start Ritual</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
